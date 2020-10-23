@@ -1,0 +1,18 @@
+package rules;
+
+import com.bolttech.edirect.rulesengine.model.Quote
+import com.bolttech.edirect.rulesengine.model.Price
+import com.bolttech.edirect.rulesengine.model.Plan
+import com.bolttech.edirect.rulesengine.model.type.VerticalType
+
+rule "discount"
+dialect  "mvel"
+    when
+        $quote : Quote(vertical == VerticalType.TRAVEL)
+        $quotePlan : Plan($quotePlanPrice : price) from $quote.plan
+    then
+        $quotePlanPrice.setDiscountPercentage(10.0);
+        $quotePlanPrice.setDiscountValue($quotePlanPrice.getProviderPrice() * 10 / 100);
+        $quotePlanPrice.setFinalPrice($quotePlanPrice.getProviderPrice() - ($quotePlanPrice.getProviderPrice() * 10 / 100));
+end
+
